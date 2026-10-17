@@ -1,0 +1,43 @@
+name: stirling-h2-import-leftover
+
+services:
+  stirling-pdf:
+    image: ${STIRLING_IMAGE:-stirlingtools/stirling-pdf:3.2.0-fat}
+    ports:
+      - "127.0.0.1:18152:8080"
+    environment:
+      DISABLE_ADDITIONAL_FEATURES: "false"
+      SECURITY_ENABLELOGIN: "true"
+      FAT_DOCKER: "true"
+      SYSTEM_DEFAULTLOCALE: en-US
+      UI_APPNAME: Stirling-PDF
+      UI_HOMEDESCRIPTION: Lab fat image with login
+      UI_APPNAMENAVBAR: Stirling-PDF Fat
+      SYSTEM_MAXFILESIZE: "100"
+      METRICS_ENABLED: "true"
+      JAVA_CUSTOM_OPTS: "-Xmx1536m"
+    volumes:
+      - stirling-configs:/configs
+      - stirling-logs:/logs
+      - stirling-tessdata:/usr/share/tessdata
+      - stirling-storage:/storage
+    labels:
+      lab: stirling-h2-import-leftover
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/api/v1/info/status | grep -q UP",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+      start_period: 90s
+    mem_limit: 4g
+    restart: "no"
+
+volumes:
+  stirling-configs:
+  stirling-logs:
+  stirling-tessdata:
+  stirling-storage:
